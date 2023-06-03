@@ -1,4 +1,10 @@
-# Variable types 
+# Lesson 1. Equality
+
+- strict equality (===): no type conversion + ```NaN != NaN``` + ```+0==-0```
+- loose equality (==): type conversion + ```NaN != NaN``` + ```+0==-0```
+- Object.is: no type conversion + no special handling for ```Nan, +0, -0```
+
+# Lesson 1. Variable types 
 
 ## Variable declarations 
 **let** - new variable in a scope {},
@@ -79,3 +85,200 @@ let array2: Array<string> = ['a', 'b', 'c'];
 let tuple: [string, number] = ["Igor", 28];
 ```
 
+# Lesson 2. Interfaces 
+
+- interface is a contract, which describe a type (data structure) but can't be instantiated itself,
+- benefits: shorthand names for common types, consistency over types in use,
+- interfaces are deleted (as well as types) when compiling to JS
+- type alias is pretty similar to an interface (subtle difference: type alias can't be changed)
+
+**Attributes**
+- required (default)
+- optional (```name?: type;```)
+- read only - can be assigned only while initialisation (```readonly name: type;```)
+
+```typescript
+
+interface IceCream {
+  flavour: string;
+  scoops: number;
+  instuctions?: string;
+}
+
+let plombire: IceCream = {
+  flavour: "oil",
+  scoops: 2
+}
+
+function tooManyScoops(icecream: IceCream) {
+  if (icecream.scoops > 4) {
+    return icecream.scoops + "is too many scoops";
+  } else {
+    return "Your order will be ready soon!"
+  }
+}
+
+console.log(tooManyScoops({flavour: "vanilla", scoops: 5}));
+
+// usage 1 indexed array structures
+interface IceCreamArray {
+  [index: number]: string;
+}
+
+let myIceCream: IceCreamArray;
+myIceCream = ['chocolate', 'vanilla', 'strawberry'];
+let myStr: string = myIceCream[0];
+
+// usage 2 wrapper over the usage of JS API
+
+interface Post {    // wrapper
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+}
+async function fetchPosts(url: string) {
+  let response = await fetch(url);  // JS API function - fetch
+  let body = await response.json(); 
+  return body as Post[];  // convert json -> Post
+}
+
+```
+
+## Structural type system
+
+- only types are taken into account
+- interfaces with members of the same type are interchangeable 
+- functions: 
+  - input parameters and return type are considered
+  - trick: it's possible to assign the function with more input | output parameters to the function with fewer numbers of them but not vice versa
+```typescript
+
+interface Ball {
+  diameter: number;
+}
+interface Sphere {
+  diameter: number;
+}
+
+let ball: Ball = { diameter: 10 };
+let sphere: Sphere = { diameter: 20 };
+
+// interchangeability of two interfaces with the same types
+sphere = ball; 
+ball = sphere;
+
+interface Tube {
+  diameter: number;
+  length: number;
+}
+
+let tube: Tube = { diameter: 12, length: 3 };
+
+// interface with less members can be assigned to the interface with more members but not vice versa
+tube = ball; // comperr
+ball = tube;
+
+// functions
+
+let createBall = (diameter: number) => ({ diameter });
+let createSphere = (diameter: number, useInches: boolean) => {
+  return { diameter: useInches ? diameter * 0.39 : diameter };
+};
+let createRedBall = (diameter: number) => ({ diameter, color: "red" });
+
+// function with less input parameters can be assigned to the function with more paramters but not vice versa
+createSphere = createBall;
+createBall = createSphere;  // comperr
+// the same for output parameters 
+createBall = createRedBall;
+createRedBall = createBall; // comperr
+
+```
+
+# Lesson 3. Functions
+
+- TypeScript supports typing input parameters and a return type of function whereas JS doesn't support this,
+- TypeScript support required and optional parameters whereas in JS all parameters are optional,
+
+## How to declare function
+
+1. Named functions: 
+   - defined in a scope, 
+   - loaded into execution before any code runs
+   - can be accessed before its declaration
+2. Anonymous functions 
+   - usually assigned to a variable or passed to another function 
+   - loaded into execution when called 
+   - can be accessed only after its declaration
+3. Arrow functions (lambda)
+   - the same as anonymous functions but with concise syntax (like in Java: short operations, implicit return)
+   - "=>"
+
+```typescript
+// named
+function addNumbers (x: number, y: number): number {   // return type can be omitted if a function doesn't return anything
+  return x + y;
+}
+addNumbers(1, 2);
+
+//anonymous
+let addNumbersVar1 = function (x: number, y: number): number {
+  return x + y;
+}
+// arrow function
+let addNumbersVar2 = (x: number, y: number): number => x + y;
+
+addNumbersVar1(1, 2);
+```
+
+## Input parameters
+
+- JS: all parameters are optional, TypeScript: by default, all parameters are required
+- Optional parameters ```x?``` or provided with a default value ```x=25```
+- varargs is supported (rest parameters): ```...others: number[]``` -> array of numbers
+- named parameters - through deconstructed object parameters (using interface)
+```typescript
+interface Message {
+   text: string;
+   sender: string;
+}
+
+function displayMessage({text, sender}: Message) {
+    console.log(`Message from ${sender}: ${text}`);
+}
+
+displayMessage({sender: 'Christopher', text: 'hello, world'});
+```
+
+## Function types
+
+- function type can be declared as typing alias or interface,
+- we can use function as a type of variable: ```let variable: function``` ,
+- when a function is a return type, you can pass values to it in the same statement,
+- declaring a function implementation, it's possible to omit data types as they can be referred from the function reference
+```typescript
+// the same
+type calculator = (x: number, y: number) => number;
+
+interface calculator {
+    (x: number, y: number): number;
+}
+
+// implementations
+let addNumbers: calculator = (x: number, y: number): number => x + y;
+let subtractNumbers: calculator = (x, y) => x - y;  // omitting data types
+
+// returning a function and calling the result
+
+let doCalculation = (operation: 'add' | 'subtract'): calculator => {
+    if (operation === 'add') {
+        return addNumbers;
+    } else {
+        return subtractNumbers;
+    }
+}
+
+console.log(doCalculation('add')(1, 2))  // doCalculation returns a function which is respectevely called with the parameters (1,2)
+
+```
