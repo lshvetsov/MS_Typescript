@@ -87,6 +87,8 @@ let tuple: [string, number] = ["Igor", 28];
 
 # Lesson 2. Interfaces 
 
+Generally, the way how an object can be described in TS.
+
 - interface is a contract, which describe a type (data structure) but can't be instantiated itself,
 - benefits: shorthand names for common types, consistency over types in use,
 - interfaces are deleted (as well as types) when compiling to JS
@@ -198,6 +200,8 @@ createRedBall = createBall; // comperr
 
 # Lesson 3. Functions
 
+Generally, the way how an object can be described in TS.
+
 - TypeScript supports typing input parameters and a return type of function whereas JS doesn't support this,
 - TypeScript support required and optional parameters whereas in JS all parameters are optional,
 
@@ -281,4 +285,112 @@ let doCalculation = (operation: 'add' | 'subtract'): calculator => {
 
 console.log(doCalculation('add')(1, 2))  // doCalculation returns a function which is respectevely called with the parameters (1,2)
 
+```
+
+# Lesson 4. Classes
+
+Generally, the way how an object can be described in TS.
+
+- class can have *constructor*, *properties*, *methods*,
+- *access modifiers* are enabled (default - *public*): public, private, protected, readonly,
+- *accessors* (get/set) are enabled
+- when comparing types, they have to have the same private and protected members.
+- *inheritance* and *method overriding* are available 
+
+```typescript
+
+interface Vehicle {
+    make: string;
+    color: string;
+    doors: number;
+    accelerate(speed: number): string;
+    brake(): string;
+    turn(direction: 'left' | 'right'): string;
+}
+
+class Car implements Vehicle{
+    
+  private static numberofCars: number = 0;
+  private make: string;  // properties
+  private color: string;
+  doors: number;
+  
+  // constructor with the optional parameter with a default value
+  constructor(make: string, color: string, doors = 4) {  
+    this.make = make;
+    this.color = color;
+    this.doors = doors;
+    Car.numberofCars++;
+  }
+
+  // getters and setters 
+  get getMake() {
+    return this.make;
+  }
+  set setMake(make:string) {
+    this.make = make;
+  }
+
+  get getColor() {
+    return 'The color of the car is ' + this.color;
+  }
+  set setColor(color: string) {
+    this.color = color;
+  }
+
+  get getDoors() {
+    return this.doors;
+  }
+  set setDoors(doors: number) {
+    if ((doors % 2) === 0) {
+        this.doors = doors;
+    } else {
+        throw new Error('Doors must be an even number');
+    }
+  }
+
+  // Methods
+  accelerate(speed: number): string {
+    return `${this.worker()} is accelerating to ${speed} MPH.`
+  }
+  brake(): string {
+    return `${this.worker()} is braking with the standard braking system.`
+  }
+  turn(direction: 'left' | 'right'): string {
+    return `${this.worker()} is turning ${direction}`;
+  } 
+  // This function performs work for the other method functions
+  protected worker(): string {
+    return this.make;
+  }
+}
+
+class ElectricCar extends Car {
+
+    private _range: number;
+
+    // Constructor: required parameters -> optional -> rest
+    constructor(make: string, color: string, range: number, doors = 2) {
+        super(make, color, doors);
+        this._range = range;
+    }
+
+    // Methods
+    charge() {
+        console.log(this.worker() + " is charging.") // calling the protected member of the superclass 
+    }
+
+    // Overrides the brake method of the Car class
+    brake(): string {
+        return `${this.worker()}  is braking with the regenerative braking system.`
+    }
+
+}
+
+// Instantiates the Car object with all parameters
+let myCar = new Car('Cool Car Company', 'blue', 3);
+myCar.doors  // property get
+myCar.doors = 5;  // property set
+myCar.getDoors;   // using getter
+myCar.setDoors = 5;   // using setter
 ```
