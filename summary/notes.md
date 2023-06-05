@@ -291,7 +291,7 @@ console.log(doCalculation('add')(1, 2))  // doCalculation returns a function whi
 
 Generally, the way how an object can be described in TS.
 
-- class can have *constructor*, *properties*, *methods*,
+- class can have *constructor* (**only one**), *properties*, *methods*,
 - *access modifiers* are enabled (default - *public*): public, private, protected, readonly,
 - *accessors* (get/set) are enabled
 - when comparing types, they have to have the same private and protected members.
@@ -393,4 +393,94 @@ myCar.doors  // property get
 myCar.doors = 5;  // property set
 myCar.getDoors;   // using getter
 myCar.setDoors = 5;   // using setter
+```
+
+# Lesson 5. Generics
+
+- replacement of type ```any``` which doesn't guarantee a type-safe,
+- one or more generic types are possible,
+- if a type is missed when initializing, it's possible to infer it for simple types or ```any``` is used, 
+
+![Generics](/pictures/generics.png)
+
+```typescript
+/////////// function
+function identity<T, U> (value: T, message: U) : T {  // use generics for input parameters and a return type
+    console.log(message);
+    return value
+}
+
+let returnNumber = identity<number, string>(100, 'Hello!');
+let returnString = identity<string, string>('100', 'Hola!');
+let returnBoolean = identity<boolean, string>(true, 'Bonjour!');
+
+returnNumber = returnNumber * 100;   // OK
+returnString = returnString * 100;   // Error: Type 'number' not assignable to type 'string'
+returnBoolean = returnBoolean * 100; // Error: Type 'number' not assignable to type 'boolean'
+
+///////////// interface
+interface ProcessIdentity1<T, U> {
+    (value: T, message: U): T;
+}
+
+function processIdentity<T, U> (value: T, message: U) : T {  // implementations of ProcessIdentity1
+    console.log(message);
+    return value
+}
+
+interface ProcessIdentity2<T, U> {
+    value: T;
+    message: U;
+    process(): T;
+}
+
+class processIdentity<X, Y> implements ProcessIdentity2<X, Y> { // implementation of ProcessIdentity2
+    value: X;
+    message: Y;
+    constructor(val: X, msg: Y) {
+        this.value = val;
+        this.message = msg;
+    }
+    process() : X {
+        console.log(this.message);
+        return this.value
+    }
+}
+
+///////////// class
+class processIdentity<T, U> {
+    private _value: T;
+    private _message: U;
+    constructor(value: T, message: U) {
+        this._value = value;
+        this._message = message;
+    }
+    getIdentity() : T {
+        console.log(this._message);
+        return this._value
+    }
+}
+let processor = new processIdentity<number, string>(100, 'Hello');
+processor.getIdentity();      // Displays 'Hello'
+
+```
+
+- generic type allows to use only general methods, to use specific methods -> ```typeof``` (primitives) | ```instanceof``` (complex types)
+- generic type constraints:
+  - extend complex type: ```T extends Object```
+  - primitives: list available types in a tuple and then extend it
+  - extend ```keyof``` of another type: ```T extends keyof Type```
+```typescript
+// tuple
+type ValidTypes = string | number;
+
+function identity<T extends ValidTypes, U> (value: T, message: U) : T {  // T can bt only string | number
+    let result: T = value + value;    // Error
+    console.log(message);
+    return result
+}
+// keyot
+function getPets<T, K extends keyof T>(pet: T, key: K) {  // K may be only from the keys of T
+    return pet[key];
+}
 ```
