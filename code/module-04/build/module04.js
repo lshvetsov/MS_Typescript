@@ -25,28 +25,6 @@ let ascending = (a, b) => {
         return 0;
     }
 };
-/*  sortDescending is a comparison function that tells the sort method how to sort
-    numbers in descending order */
-// function sortDescending(a, b) {
-// if (a > b) {
-//     return -1;
-// } else if (b > a) {
-//     return 1;
-// } else {
-//     return 0;
-// }
-// }
-/*  sortDescending is a comparison function that tells the sort method how to sort
-    numbers in ascending order. */
-// function sortAscending(a, b) {
-// if (a > b) {
-//     return 1;
-// } else if (b > a) {
-//     return -1;
-// } else {
-//     return 0;
-// }
-// }
 /*  The buildArray function builds an array of unique random numbers containing the number
     of items based on the number passed to it. The sortOrder parameter determines
     whether to sort the array in ascending or descending order. */

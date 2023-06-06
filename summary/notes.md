@@ -484,3 +484,42 @@ function getPets<T, K extends keyof T>(pet: T, key: K) {  // K may be only from 
     return pet[key];
 }
 ```
+
+# Lesson 6. Modules & external libraries 
+
+**Modules** is a way to organize and categorize code as well as limit its scope from global to module one. 
+
+- *export* to make a block of code of your module public
+- *import* to allow to use a public block of code in your program
+- js files have to be imported to be executed in a browser
+- modules are resolving by a *module loader*, which can be specified in a compiling command or tsconfig.json
+```"module": "commonjs"```: Node.js -> CommonJS; require.js -> AMD, UMD, SystemJS; ECMAScript 2015 (ES6) -> module-loading systems.
+
+```typescript
+// export, file "greetings_module.ts"
+export function returnGreeting (greeting: string) {
+    console.log(`The message from Greetings_module is ${greeting}.`);
+}
+
+// import 
+// single function in the module
+import { returnGreeting } from './greetings_module.js';
+returnGreeting('Hola!')
+// all exported components in the module
+import * as allGreetingFunctions from './greetings_module.js';
+allGreetingFunctions.returnGreeting('Bonjour');
+// with changing the name
+import { returnGreeting as greetingFunction } from './greetings_module.js';
+returnGreetingLength('Ciao!');  
+
+```
+
+### Import external libraries
+
+- import libraries into the ts file ```import dotenv from 'dotenv';``` (in JS - ```required```)
+- TS compiler may raise errors when you use JS libraries without type definitions but it's possible to install them separately using @types (for example from [DefinitelyTyped](https://definitelytyped.github.io/)) 
+```
+npm install --save-dev @types/<library-name>
+example: npm install --save-dev @types/node @types/dotenv
+```
+- Type definitions can be installed as [devDependencies](https://docs.npmjs.com/specifying-dependencies-and-devdependencies-in-a-package-json-file) as they are only needed at design time
