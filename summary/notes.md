@@ -487,7 +487,14 @@ function getPets<T, K extends keyof T>(pet: T, key: K) {  // K may be only from 
 
 # Lesson 6. Modules & external libraries 
 
+TypeScript provides two ways to organize code: **namespaces** and **modules**. 
+Starting with ECMAScript 2015, modules are native part of the language and are recommended for code organization.
+Also, it is not recommended to combine namespaces and modules in the same project.
+
 **Modules** is a way to organize and categorize code as well as limit its scope from global to module one. 
+
+In TypeScript, just as in ECMAScript 2015, any file containing a top-level *import* or *export* is considered a *module*. 
+Conversely, a file without any top-level import or export declarations is treated as a *script* whose contents are available in the global scope (and therefore to modules as well).
 
 - *export* to make a block of code of your module public
 - *import* to allow to use a public block of code in your program
@@ -514,7 +521,7 @@ returnGreetingLength('Ciao!');
 
 ```
 
-### Import external libraries
+## Import external libraries
 
 - import libraries into the ts file ```import dotenv from 'dotenv';``` (in JS - ```required```)
 - TS compiler may raise errors when you use JS libraries without type definitions but it's possible to install them separately using @types (for example from [DefinitelyTyped](https://definitelytyped.github.io/)) 
@@ -523,3 +530,59 @@ npm install --save-dev @types/<library-name>
 example: npm install --save-dev @types/node @types/dotenv
 ```
 - Type definitions can be installed as [devDependencies](https://docs.npmjs.com/specifying-dependencies-and-devdependencies-in-a-package-json-file) as they are only needed at design time
+
+# Lesson 7. Namespaces
+
+**Namespaces** (referred to as "internal modules" in earlier versions of TypeScript) are a TypeScript-specific way to organize and categorize your code, enabling you to group related code (variables, functions, interfaces, or classes) together. 
+
+- code inside a namespace pulled from the global context (preventing a context pollution)
+- avoiding naming conflicts (```namespace1.function()``` and ```namespace2.function()```)
+- TS feature -> removed when compiling to JS
+- namespaces can be nested (namespace of namespaces)
+- use *export* to allow using namespace code outside of it, calling this code: ```namespace.function()```
+
+```typescript
+
+namespace GreetingsWithLength {
+    export function returnGreeting (greeting: string) {   // public function
+        let greetingLength = getLength(greeting);
+        console.log(`The message from namespace GreetingsWithLength is ${greeting}. It is ${greetingLength} characters long.`);
+    }
+    function getLength(message: string): number {    // private function (scope = namespace)
+        return message.length
+    }
+}
+
+// calling the code in the namespace
+returnGreeting('Hello');                     // Returns error
+GreetingsWithLength.returnGreeting('Hola');  // OK
+
+// namespace of namespaces
+namespace AllGreetings {
+    export namespace Greetings {     // public namespace
+        export function returnGreeting (greeting: string) {    // public function
+            console.log(`The message from namespace Greetings is ${greeting}.`);
+        }
+    }
+    export namespace GreetingsWithLength {
+        export function returnGreeting (greeting: string) {
+            console.log(`The message from namespace GreetingsWithLength is ${greeting}. It is ${greetingLength} characters long.`);
+        }
+    }
+}
+
+// using aliases (for complex namespace structure)
+import greet = AllGreetings.Greetings;
+greet.returnGreeting('Bonjour');
+
+```
+
+## Multi-file namespaces
+
+It's possible to combine several fine into one logical module. For this, it needs to add a reference: ```/// <reference path="file.ts"/>```. 
+
+Compilation options:
+- different files -> default option -> it needs to use ```<script>``` on the webpage to download all scripts in the right order. 
+- one file -> option ```--outFile```: ```tsc --outFile main.js main.ts```
+
+![modules vs namespaces](summary/pictures/modules_vs_namespaces.png)
