@@ -1,3 +1,12 @@
+**Useful links**
+
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)  
+- [TypeScript GitBook](https://basarat.gitbook.io/typescript)  
+- [DefinitelyTyped: JS libraries TS definitions](https://definitelytyped.github.io/))
+
+
+![van](/pictures/van.png)
+
 # Lesson 1. Equality
 
 - strict equality (===): no type conversion + ```NaN != NaN``` + ```+0==-0```
@@ -585,4 +594,4 @@ Compilation options:
 - different files -> default option -> it needs to use ```<script>``` on the webpage to download all scripts in the right order. 
 - one file -> option ```--outFile```: ```tsc --outFile main.js main.ts```
 
-![modules vs namespaces](summary/pictures/modules_vs_namespaces.png)
+![modules vs namespaces](pictures/modules_vs_namespaces.png)
