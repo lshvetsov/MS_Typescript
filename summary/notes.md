@@ -1,3 +1,14 @@
+# Table of Contents
+1. [Lesson 1 Equality](#lesson-1-equality)
+2. [Lesson 2 Interfaces](#lesson-2-interfaces)
+3. [Lesson 3 Functions](#lesson-3-functions)
+4. [Lesson 4 Classes](#lesson-4-classes)
+5. [Lesson 5 Generics](#lesson-5-generics)
+6. [Lesson 6 Modules & External libraries](#lesson-6-modules--external-libraries)
+7. [Lesson 7 Namespaces](#lesson-7-namespaces)
+8. [Lesson 8 Extra features](#lesson-8-extra-features)
+
+
 **Useful links**
 
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)  
@@ -595,3 +606,205 @@ Compilation options:
 - one file -> option ```--outFile```: ```tsc --outFile main.js main.ts```
 
 ![modules vs namespaces](pictures/modules_vs_namespaces.png)
+
+
+# Lesson 8. Extra features
+
+### Arrow functions
+- shorter syntax (no ```function```, no arguments)
+- keep ```this```
+
+```typescript
+class Person {
+    constructor(public age:number) {}
+    growOld = () => {
+        this.age++;
+    }
+}
+var person = new Person(1);
+setTimeout(person.growOld,1000);
+
+setTimeout(function() { console.log(person.age); },2000); // 2
+```
+
+### Rest parameters
+
+Like varargs
+
+```typescript
+function iTakeItAll(first, second, ...allOthers) {
+    console.log(allOthers);
+}
+iTakeItAll('foo', 'bar'); // []
+iTakeItAll('foo', 'bar', 'bas', 'qux'); // ['bas','qux']
+```
+
+### let / const / var
+
+```var``` - defining a variable in a *functions* scope (or global)
+```let``` - defining a variable in a *block* scope
+```const``` - defining a immutable variable in a *block* scope
+
+### Deconstructing 
+
+Expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables.
+
+```typescript
+var rect = { x: 0, y: 10, width: 15, height: 20 };
+
+var {x, y, width, height} = rect; // Destructuring assignment
+console.log(x, y, width, height); // 0,10,15,20
+
+rect.x = 10;
+({x, y, width, height} = rect); // assign to existing variables using outer parentheses
+console.log(x, y, width, height); // 10,10,15,20
+
+// comparing
+
+const obj = {"some property": "some value"}; // structure
+const {"some property": someProperty} = obj;  // destructure
+console.log(someProperty === "some value"); // true
+
+// array destructing
+var [x, y, ...remaining] = [1, 2, 3, 4];
+console.log(x, y, remaining); // 1, 2, [3,4]
+var [x, , ...remaining] = [1, 2, 3, 4];  // ignore one element
+console.log(x, remaining); // 1, [3,4]
+
+// swap elements
+var x = 1, y = 2;
+[x, y] = [y, x];
+console.log(x, y); // 2,1
+
+
+```
+
+## Spread operator
+
+Simple syntax for applying elements of an array | object to sequence of variables | parameters
+
+```typescript
+function foo(x, y, z) { }
+var args = [0, 1, 2];
+foo(...args);
+
+var [x, y, ...remaining] = [1, 2, 3, 4];  // rest parameters - 1,2,[3,4]
+
+var list = [1, 2];
+list = [...list, 3, 4];   // array spreading  - 1,2,3,4
+
+const point2D = {x: 1, y: 2};
+const point3D = {...point2D, z: 3};
+```
+
+## for of
+
+Solution to the JS caveat that in ```for x in array``` x - index
+```typescript
+for (var item in someArray) {
+    console.log(item); // 0,1,2
+}
+
+for (var item of someArray) {
+    console.log(item); // 9,2,5
+}
+```
+
+## Iterators
+
+Any implementation of the *Iterator interface*.  
+It's recommended to use ```IterableIterator``` as it more convenient both for iterating and for getting the next element. 
+
+```typescript
+interface Iterator<T> {
+    next(value?: any): IteratorResult<T>;
+    return?(value?: any): IteratorResult<T>;
+    throw?(e?: any): IteratorResult<T>;
+}
+
+interface IteratorResult<T> {
+    done: boolean;
+    value: T;
+}
+```
+
+## Template strings
+
+Put in `` instead of ordinary '' and "" and used for: 
+
+- sting interpolation
+- multiple-line strings
+- tagged templates - a function that can be put before the template string and can preprocess this template and placeholders returning a result string.  
+
+```typescript
+// sting interpolation
+var html = '<div>' + lyrics + '</div>';
+var html = `<div>${lyrics}</div>`;  // with a template
+
+// multiple lines 
+var lyrics = "Never gonna give you up \
+\nNever gonna let you down";
+var lyrics = `Never gonna give you up
+Never gonna let you down`;  // with a template
+
+//tagged templates
+var html = htmlEscape `<div> I would just like to say : ${say}</div>`;  // htmplEscape is a tag function
+```
+
+## Promise
+
+Function = function for controlling whether using the *resolve* function or *reject* one + functions for resolving and rejecting. 
+
+```typescript
+const promise = new Promise((resolve, reject) => {
+    // the resolve / reject functions control the fate of the promise
+});
+
+const promise1 = new Promise((resolve, reject) => {
+    resolve(123);   // logic of controlling
+});
+promise1.then((res) => {   // what to do in case of resolving
+    console.log('I get called:', res === 123); // I get called: true
+});
+promise1.catch((err) => {  // what to do in case of error
+    // This is never called
+});
+
+```
+
+## Generators
+- syntax - ```function*```
+- keyword ```yield``` to return values. 
+
+Function that return lis of values. 
+
+```typescript
+function* idMaker(){
+  let index = 0;
+  while(index < 3)
+    yield index++;
+}
+
+let gen = idMaker();
+
+console.log(gen.next()); // { value: 0, done: false }
+console.log(gen.next()); // { value: 1, done: false }
+console.log(gen.next()); // { value: 2, done: false }
+console.log(gen.next()); // { done: true }
+```
+
+## Async await
+
+Ability to block async code on the promise resolution
+
+```typescript
+async function foo() {
+    try {
+        var val = await getMeAPromise();
+        console.log(val);
+    }
+    catch(err) {
+        console.log('Error: ', err.message);
+    }
+}
+```
