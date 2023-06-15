@@ -7,14 +7,15 @@
 6. [Lesson 6 Modules & External libraries](#lesson-6-modules--external-libraries)
 7. [Lesson 7 Namespaces](#lesson-7-namespaces)
 8. [Lesson 8 Extra features](#lesson-8-extra-features)
-9. [Lesson 8 Project](#lesson-9-project)
+9. [Lesson 9 Project](#lesson-9-project)
+10. [Lesson 10 Other](#lesson-10-other)
 
 
 **Useful links**
 
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)  
 - [TypeScript GitBook](https://basarat.gitbook.io/typescript)  
-- [DefinitelyTyped: JS libraries TS definitions](https://definitelytyped.github.io/))
+- [DefinitelyTyped: JS libraries TS definitions](https://definitelytyped.github.io/)
 
 
 ![van](/pictures/van.png)
@@ -889,5 +890,31 @@ package
 └─ ... All your compiled files (Generated)
 ```
 
+# Lesson 10. Other
 
+## Migration JS -> TS
+
+1. Add a tsconfig.json.
+2. Change your source code file extensions from .js to .ts. 
+3. Suppressing errors using ```any```.
+4. Write new code in TypeScript and make as little use of any as possible.
+5. Go back to the old code and start adding type annotations and fix identified bugs. 
+6. Use ambient definitions for third party JavaScript code (see DefinitelyTyped in *Useful Links*)
+
+## Compiler structure 
+
+- Scanner (scanner.ts)
+- Parser (parser.ts)
+- Binder (binder.ts)
+- Checker (checker.ts)
+- Emitter (emitter.ts)
+
+*AST* = Abstract Syntax Tree
+
+**Compilation stages**  
+1) SourceCode ~~ **scanner** ~~> Token Stream  
+2) Token Stream ~~ **parser** ~~> AST  
+3) AST ~~ **binder** ~~> Symbols  
+4) AST + Symbols ~~ **checker** ~~> Type Validation  
+5) AST + Checker ~~ **emitter** ~~> JS  
 
